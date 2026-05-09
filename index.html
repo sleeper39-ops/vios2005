@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Vios 2005 Dashboard</title>
+    <title>Vios 2005 Pro Dashboard</title>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
@@ -28,22 +28,20 @@
             background-color: var(--bg); 
             color: var(--text-main);
             margin: 0; padding: 0;
-            padding-bottom: 80px; /* Space for mobile nav */
+            padding-bottom: 80px; 
         }
 
         .container { max-width: 800px; margin: 0 auto; padding: 15px; }
 
-        /* Header */
         header {
             padding: 20px 0;
             text-align: center;
             border-bottom: 1px solid #334155;
             margin-bottom: 20px;
+            position: relative;
         }
         header h1 { margin: 0; font-size: 1.5rem; color: var(--primary); letter-spacing: 1px; }
-        .sync-indicator { font-size: 0.7rem; color: var(--text-dim); margin-top: 5px; }
 
-        /* Mileage Section */
         .mileage-box {
             background: linear-gradient(145deg, #1e293b, #0f172a);
             padding: 25px;
@@ -67,7 +65,6 @@
             font-weight: bold;
         }
 
-        /* Tabs Mobile Bottom Nav */
         .tabs {
             position: fixed; bottom: 0; left: 0; right: 0;
             background: rgba(30, 41, 59, 0.95);
@@ -84,7 +81,6 @@
         .tab-btn.active { color: var(--primary); }
         .tab-btn i { font-size: 1.2rem; margin-bottom: 4px; }
 
-        /* Maintenance Cards */
         .card {
             background: var(--card-bg);
             border-radius: 16px;
@@ -106,12 +102,10 @@
             background: rgba(0,0,0,0.2); border-radius: 8px; color: var(--primary);
         }
 
-        /* Tables & Lists */
         .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
         .data-table td { padding: 12px 8px; border-bottom: 1px solid #334155; }
         .data-table td:last-child { text-align: right; font-weight: bold; color: var(--primary); }
 
-        /* Admin Controls */
         .admin-controls { margin-top: 15px; display: none; gap: 10px; justify-content: center; }
         .btn {
             padding: 10px 18px; border-radius: 10px; border: none; 
@@ -134,9 +128,7 @@
             display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 0.75rem; margin-right: 5px;
         }
     </style>
-    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -144,10 +136,9 @@
 <div class="container">
     <header>
         <button class="btn-edit-toggle" onclick="toggleAdmin()"><i class="fa-solid fa-sliders"></i></button>
-        <h1>VIOS 2005<span style="font-weight: normal;1</span></h1>
+        <h1>VIOS 2005</h1>
     </header>
 
-    <!-- NAVIGATION TABS -->
     <nav class="tabs">
         <button class="tab-btn active" onclick="openTab('maintenance', this)">
             <i class="fa-solid fa-oil-can"></i>บำรุงรักษา
@@ -160,7 +151,6 @@
         </button>
     </nav>
 
-    <!-- CONTENT: MAINTENANCE -->
     <div id="maintenance" class="tab-content active">
         <div class="mileage-box">
             <label>CURRENT ODOMETER (KM)</label>
@@ -173,27 +163,22 @@
         <div id="maintenanceGrid"></div>
     </div>
 
-    <!-- CONTENT: BATTERY -->
     <div id="battery" class="tab-content">
         <div class="card" style="border-left-color: var(--primary);">
             <h3 style="color: var(--primary);"><i class="fa-solid fa-bolt"></i> แบตเตอรี่ 46B24L</h3>
-            <p class="card-meta">เกณฑ์การตรวจวัดแรงดันไฟ (Voltage)</p>
-            
             <table class="data-table">
-                <tr><td>แรงดันแบตเตอรี่ (Engine Off)</td><td>> 12.5v</td></tr>
-                <tr><td>สตาร์ทเตอร์เทส (Cranking)</td><td>> 10.3v</td></tr>
+                <tr><td>แรงดันแบตเตอรี่ (Off)</td><td>> 12.5v</td></tr>
+                <tr><td>สตาร์ทเตอร์เทส</td><td>> 10.3v</td></tr>
                 <tr><td>ไดชาร์จ (Engine On)</td><td>> 13.3v</td></tr>
             </table>
-
             <div style="margin-top: 15px; font-size: 0.8rem;">
                 <span class="volt-badge" style="background: var(--success);">ปกติ</span>
-                <span class="volt-badge" style="background: var(--warning);">เฝ้าระวัง (12.0-12.5v)</span>
-                <span class="volt-badge" style="background: var(--danger);">เปลี่ยนทันที (< 12.0v)</span>
+                <span class="volt-badge" style="background: var(--warning);">เฝ้าระวัง</span>
+                <span class="volt-badge" style="background: var(--danger);">เปลี่ยนทันที</span>
             </div>
         </div>
     </div>
 
-    <!-- CONTENT: MANUAL -->
     <div id="manual" class="tab-content">
         <div class="card" style="border-left-color: var(--accent);">
             <h3><i class="fa-solid fa-wrench"></i> ค่าแรงขันน็อต (Torque)</h3>
@@ -205,15 +190,13 @@
                 <tr><td>น็อตล้อ (จริง)</td><td>112 Nm</td></tr>
             </table>
         </div>
-
         <div class="card" style="border-left-color: var(--primary);">
-            <h3><i class="fa-solid fa-key"></i> การเซ็ตค่ารีโมท (315 Mhz)</h3>
+            <h3><i class="fa-solid fa-key"></i> ตั้งค่ารีโมท & กันขโมย</h3>
             <div class="card-note" style="color: white; line-height: 1.6;">
                 1. เปิดประตูค้างไว้ <br>
                 2. บิดกุญแจ Acc ↔ On (5 ครั้ง) <br>
                 3. ไฟ Security ค้าง → กด Lock (ไฟดับ) <br>
-                4. กด Lock อีกครั้ง (ไฟกระพริบ) <br>
-                5. ปิดประตู บิดกุญแจกลับ ดึงกุญเเจออก
+                5. ปิดประตู บิดกุญแจกลับ ดึงกุญเเจออก <br>
                 6. ทดสอบใช้งานรีโมทที่ Copy
             </div>
             <p class="card-meta" style="margin-top: 10px;">* ปิดเสียงกันขโมย: ปลดล็อค + ปุ่มเสียง ค้างไว้</p>
@@ -222,7 +205,6 @@
 </div>
 
 <script>
-    // Config เดิมของคุณ
     const firebaseConfig = {
         apiKey: "AIzaSyAgWzfe-JzSDq5Q7JTw_GuWPyl9xmLUxjM",
         authDomain: "vios2005-30708.firebaseapp.com",
@@ -271,7 +253,6 @@
         maintenanceData.forEach(item => {
             const rem = item.nextKm - current;
             const status = rem <= 0 ? 'status-danger' : (rem <= 2000 ? 'status-warning' : 'status-ok');
-            
             const card = document.createElement('div');
             card.className = `card ${status}`;
             
@@ -281,7 +262,7 @@
                     <div class="rem-val" style="color: ${rem <= 0 ? 'var(--danger)' : (rem <= 2000 ? 'var(--warning)' : 'var(--success)')}">
                         ${rem <= 0 ? 'OVERDUE ' + Math.abs(rem).toLocaleString() : rem.toLocaleString() + ' KM'}
                     </div>
-                    <div class="card-meta">NEXT SERVICE: ${item.nextKm.toLocaleString()} KM</div>
+                    <div class="card-meta">NEXT: ${item.nextKm.toLocaleString()} KM</div>
                     ${item.note ? `<div class="card-note">${item.note}</div>` : ''}
                 `;
             } else {
@@ -315,11 +296,10 @@
 
     function saveAllToFirebase() {
         db.ref('vios_data/items').set(maintenanceData).then(() => {
-            alert("บันทึกสำเร็จ!");
+            alert("บันทึกแล้ว");
             toggleAdmin();
         });
     }
 </script>
-
 </body>
 </html>
