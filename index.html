@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vios 2005 Maintenance System</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #f4f7f6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+            background-color: var(--light);
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .mileage-input-section {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        input[type="number"] {
+            font-size: 1.5rem;
+            padding: 10px;
+            width: 200px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border-left: 8px solid #ccc;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card.status-ok { border-left-color: var(--success); }
+        .card.status-warning { border-left-color: var(--warning); }
+        .card.status-danger { border-left-color: var(--danger); }
+
+        .card h3 {
+            margin-top: 0;
+            color: var(--primary);
+            font-size: 1.2rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .info {
+            font-size: 0.9rem;
+            margin: 8px 0;
+        }
+
+        .remaining {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 15px;
+        }
+
+        .note {
+            font-size: 0.8rem;
+            color: #666;
+            font-style: italic;
+            background: #f9f9f9;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .bg-ok { background: var(--success); }
+        .bg-warning { background: var(--warning); }
+        .bg-danger { background: var(--danger); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Vios 2005 G1 Maintenance</h1>
+        <p>ระบบติดตามการบำรุงรักษารถยนต์</p>
+    </header>
+
+    <div class="mileage-input-section">
+        <label for="currentMileage">เลขไมล์ปัจจุบันของคุณ (กม.):</label><br><br>
+        <input type="number" id="currentMileage" value="200000" oninput="calculateMaintenance()">
+    </div>
+
+    <div id="maintenanceGrid" class="grid">
+        </div>
+</div>
+
+<script>
+    const maintenanceData = [
+        {
+            name: "น้ำมันเครื่อง (Shell HX8 10W-40)",
+            nextKm: 212000,
+            interval: 10000,
+            note: "ปริมาณ 3.7 ลิตร / ราคา 1,650.-",
+            lastUpdate: "ล่าสุด 200,000 กม."
+        },
+        {
+            name: "น้ำมันเกียร์ (Toyota T-IV)",
+            nextKm: 240000,
+            interval: 40000,
+            note: "ปริมาณ 3.5 ลิตร (เปลี่ยนล่าสุด 22 ก.พ. 68)",
+            lastUpdate: "กรอง+ปะเก็น เปลี่ยนที่ 300,000 กม."
+        },
+        {
+            name: "น้ำมันเบรก (TRW)",
+            nextKm: 240000,
+            interval: 40000,
+            note: "ลำดับการไล่ลม: หลังซ้าย > หลังขวา > หน้าซ้าย > หน้าขวา",
+            lastUpdate: "รอบถัดไป 240,000 กม."
+        },
+        {
+            name: "น้ำมันพาวเวอร์ (Toyota)",
+            nextKm: 240000,
+            interval: 40000,
+            note: "เปลี่ยนล่าสุด 19 ก.พ. 68",
+            lastUpdate: "รอบถัดไป 240,000 กม."
+        },
+        {
+            name: "น้ำยาหล่อเย็น (Coolant)",
+            nextKm: 220000,
+            interval: 40000,
+            note: "เปลี่ยนล่าสุด 22 พ.ค. 67 (ที่ 180,000 กม.)",
+            lastUpdate: "รอบถัดไป 220,000 กม."
+        },
+        {
+            name: "สายพานหน้าเครื่อง",
+            nextKm: 270000,
+            interval: 80000,
+            note: "เปลี่ยนล่าสุด 1 ก.ย. 67 (ที่ 190,000 กม.)",
+            lastUpdate: "รอบถัดไป 270,000 กม."
+        },
+        {
+            name: "หัวเทียน (Toyota)",
+            nextKm: 240000,
+            interval: 40000,
+            note: "เปลี่ยนล่าสุด 10 ก.พ. 68 (ที่ 200,000 กม.)",
+            lastUpdate: "รอบถัดไป 240,000 กม."
+        },
+        {
+            name: "เบรกหน้า (จาน + ผ้าเบรก Nokiyo)",
+            nextKm: 999999, // บันทึกวันที่เฉยๆ
+            interval: 0,
+            note: "จัดการเมื่อวันที่ 9 พ.ค. 69",
+            lastUpdate: "เช็คสภาพตามระยะ",
+            isStatic: true
+        }
+    ];
+
+    function calculateMaintenance() {
+        const current = parseInt(document.getElementById('currentMileage').value) || 0;
+        const grid = document.getElementById('maintenanceGrid');
+        grid.innerHTML = '';
+
+        maintenanceData.forEach(item => {
+            let statusClass = 'status-ok';
+            let badgeClass = 'bg-ok';
+            let statusText = 'ปกติ';
+            let remainingText = '';
+
+            if (item.isStatic) {
+                remainingText = "บันทึกประวัติการเปลี่ยน";
+            } else {
+                const remaining = item.nextKm - current;
+                
+                if (remaining <= 0) {
+                    statusClass = 'status-danger';
+                    badgeClass = 'bg-danger';
+                    statusText = 'เกินกำหนดเปลี่ยน!';
+                    remainingText = `เกินมาแล้ว ${Math.abs(remaining).toLocaleString()} กม.`;
+                } else if (remaining <= 2000) {
+                    statusClass = 'status-warning';
+                    badgeClass = 'bg-warning';
+                    statusText = 'ใกล้ถึงกำหนด';
+                    remainingText = `เหลืออีก ${remaining.toLocaleString()} กม.`;
+                } else {
+                    remainingText = `เหลืออีก ${remaining.toLocaleString()} กม.`;
+                }
+            }
+
+            const card = document.createElement('div');
+            card.className = `card ${statusClass}`;
+            card.innerHTML = `
+                <span class="badge ${badgeClass}">${statusText}</span>
+                <h3>${item.name}</h3>
+                <div class="info">กำหนดที่: <strong>${item.isStatic ? '-' : item.nextKm.toLocaleString() + ' กม.'}</strong></div>
+                <div class="info">${item.lastUpdate}</div>
+                <div class="remaining">${remainingText}</div>
+                <p class="note">${item.note}</p>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    // เรียกฟังก์ชันครั้งแรกเมื่อโหลดหน้าเว็บ
+    calculateMaintenance();
+</script>
+
+</body>
+</html>
