@@ -92,11 +92,11 @@
             transition: 0.3s;
             position: relative;
         }
+        .card h3 { margin: 0 0 10px 0; font-size: 1.1rem; }
         .card.status-ok { border-left-color: var(--success); }
         .card.status-warning { border-left-color: var(--warning); }
         .card.status-danger { border-left-color: var(--danger); }
 
-        .card h3 { margin: 0 0 10px 0; font-size: 1.1rem; }
         .rem-val { font-size: 1.4rem; font-weight: bold; margin-bottom: 5px; }
         .card-meta { font-size: 0.8rem; color: var(--text-dim); }
         .card-note { 
@@ -121,7 +121,7 @@
 
         .consump-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .consump-item { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px; text-align: center; }
-        
+
         .admin-controls { margin-top: 15px; display: none; gap: 10px; justify-content: center; }
         .btn { padding: 10px 18px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
         .btn-add { background: var(--accent); color: white; }
@@ -169,7 +169,7 @@
             <h3 style="color: var(--primary);"><i class="fa-solid fa-bolt"></i> แบตเตอรี่ 46B24L (12V)</h3>
             <table class="data-table">
                 <tr>
-                    <td>แรงดันไฟฟ้า (ดับเครื่อง)<br><small style="color:var(--text-dim)">Battery Voltage</small></td>
+                    <td>แรงดันไฟฟ้า (ดับเครื่อง)</td>
                     <td>
                         <div class="badge-grid">
                             <span class="status-badge bg-ok">> 12.5v ปกติ</span>
@@ -179,7 +179,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>สตาร์ทเตอร์เทส<br><small style="color:var(--text-dim)">Starter Test</small></td>
+                    <td>สตาร์ทเตอร์เทส</td>
                     <td>
                         <div class="badge-grid">
                             <span class="status-badge bg-ok">> 10.3v ปกติ</span>
@@ -189,7 +189,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>ไดชาร์จ (ติดเครื่อง)<br><small style="color:var(--text-dim)">Alternator Output</small></td>
+                    <td>ไดชาร์จ (ติดเครื่อง)</td>
                     <td>
                         <div class="badge-grid">
                             <span class="status-badge bg-ok">> 13.3v ปกติ</span>
@@ -203,6 +203,7 @@
     </div>
 
     <div id="manual" class="tab-content">
+        <!-- ข้อมูลพื้นฐาน -->
         <div class="card" style="border-left-color: var(--primary);">
             <h3><i class="fa-solid fa-car"></i> ข้อมูลพื้นฐานรถยนต์</h3>
             <div class="card-note" style="color: #fff; word-break: break-all;">
@@ -211,45 +212,41 @@
             </div>
         </div>
 
-        <div class="card" style="border-left-color: var(--success);">
-            <h3><i class="fa-solid fa-gauge-high"></i> ข้อมูลล้อและยาง</h3>
-            <div class="card-note">
-                <strong>Size:</strong> 195/55 R15 / 85H<br>
-                <strong>หน้า:</strong> 34 PSI | <strong>หลัง:</strong> 33 PSI
+        <!-- ตั้งค่ารีโมท -->
+        <div class="card" style="border-left-color: var(--accent);">
+            <h3><i class="fa-solid fa-key"></i> ตั้งค่ารีโมท 315MHz</h3>
+            <div class="card-note" style="color: white; line-height: 1.6;">
+                1. เปิดประตูฝั่งคนขับค้างไว้ <br>
+                2. บิดกุญแจไปที่ Acc ↔ On (5 ครั้ง) <br>
+                3. ไฟ Security ค้าง → กด Lock ที่รีโมทใหม่ (ไฟดับ) <br>
+                4. กดปุ่ม Lock ไฟสีแดงจะกระพริบยืนยัน <br>
+                5. ปิดประตู บิดกุญแจกลับ ดึงกุญเเจออกเพื่อจบขั้นตอน
+                6. ทดสอบใช้งานรีโมท Copy
             </div>
-            <div class="consump-grid">
-                <div class="consump-item">
-                    <div style="font-size: 0.7rem; color: var(--text-dim);">ในเมือง</div>
-                    <div style="color: var(--warning); font-weight: bold;">10-12</div>
-                    <div style="font-size: 0.6rem;">km/L</div>
-                </div>
-                <div class="consump-item">
-                    <div style="font-size: 0.7rem; color: var(--text-dim);">นอกเมือง</div>
-                    <div style="color: var(--success); font-weight: bold;">15-16</div>
-                    <div style="font-size: 0.6rem;">km/L</div>
-                </div>
+            <div class="card-note" style="background: rgba(239, 68, 68, 0.2); border-radius: 8px; margin-top: 10px; color: #fff;">
+                <strong>วิธีปิดเสียงกันขโมย:</strong> <br>
+                กดปุ่ม [ปลดล็อค] + [ปุ่มรูปเสียง/ลำโพง] ค้างไว้พร้อมกันจนกว่าไฟจะตอบรับ
             </div>
         </div>
 
-        <div class="card" style="border-left-color: var(--accent);">
+        <!-- ค่าทอร์ค -->
+        <div class="card" style="border-left-color: var(--warning);">
             <h3><i class="fa-solid fa-wrench"></i> ค่าแรงขันน็อต (Torque)</h3>
             <table class="data-table">
                 <tr><td>น็อตน้ำมันเครื่อง</td><td>39 Nm</td></tr>
                 <tr><td>น็อตน้ำมันเกียร์</td><td>49 Nm</td></tr>
                 <tr><td>หัวเทียน</td><td>25 Nm</td></tr>
-                <tr><td>น็อตคอยล์ / ฝาสูบ</td><td>8 / 10 Nm</td></tr>
-                <tr><td>น็อตล้อ (จริง)</td><td>112 Nm</td></tr>
+                <tr><td>น็อตล้อ</td><td>112 Nm</td></tr>
             </table>
         </div>
 
+        <!-- จุดระวัง -->
         <div class="card" style="border-left-color: var(--danger);">
             <h3><i class="fa-solid fa-triangle-exclamation"></i> จุดที่ต้องระวัง (Vios Gen 1)</h3>
             <div class="card-note" style="color: #fff; font-size: 0.8rem;">
-                • <strong>ระบบน้ำ:</strong> วาวน้ำ, ปั้มน้ำ, หม้อน้ำ, ข้ออ่อน (เปลี่ยนทุก 4-5 ปี)<br>
-                • <strong>ช่วงล่าง:</strong> ยางรองโช้ค ขาดบ่อย<br>
-                • <strong>เครื่องกระตุก:</strong> เช็ค คอยล์ > หัวเทียน > หัวฉีด<br>
-                • <strong>แอร์ไม่เย็น:</strong> เช็คหน้าครัชคอมแอร์ก่อนอันดับแรก<br>
-                • <strong>ตัวถัง:</strong> กระจกไฟฟ้าชอบตกร่อง
+                • ระบบน้ำ: วาวน้ำ, ปั้มน้ำ, หม้อน้ำ (เปลี่ยนทุก 4-5 ปี)<br>
+                • ช่วงล่าง: ยางรองโช้ค และปีกนกชอบทรุด<br>
+                • เครื่องกระตุก: เช็ค คอยล์ > หัวเทียน > ล้างลิ้นปีกผีเสื้อ
             </div>
         </div>
     </div>
@@ -270,7 +267,6 @@
     const db = firebase.database();
     let maintenanceData = [];
     let isAdmin = false;
-    let sortableInstance = null;
 
     db.ref('vios_data').on('value', (snap) => {
         const data = snap.val();
@@ -290,36 +286,12 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(tabName).classList.add('active');
         btn.classList.add('active');
-        window.scrollTo(0,0);
     }
 
     function toggleAdmin() {
         isAdmin = !isAdmin;
         document.getElementById('adminPanel').style.display = isAdmin ? 'flex' : 'none';
         renderMaintenance(document.getElementById('currentMileage').value);
-        
-        const el = document.getElementById('maintenanceGrid');
-        if (isAdmin) {
-            sortableInstance = new Sortable(el, {
-                animation: 150,
-                handle: '.drag-handle',
-                ghostClass: 'sortable-ghost',
-                onEnd: function() {
-                    const newOrder = [];
-                    el.querySelectorAll('.card').forEach(card => {
-                        const id = parseInt(card.getAttribute('data-id'));
-                        const item = maintenanceData.find(x => x.id === id);
-                        if (item) newOrder.push(item);
-                    });
-                    maintenanceData = newOrder;
-                }
-            });
-        } else {
-            if (sortableInstance) {
-                sortableInstance.destroy();
-                sortableInstance = null;
-            }
-        }
     }
 
     function renderMaintenance(current) {
@@ -330,7 +302,6 @@
             const status = rem <= 0 ? 'status-danger' : (rem <= 2000 ? 'status-warning' : 'status-ok');
             const card = document.createElement('div');
             card.className = `card ${status}`;
-            card.setAttribute('data-id', item.id);
             
             if(!isAdmin) {
                 card.innerHTML = `
@@ -343,7 +314,6 @@
                 `;
             } else {
                 card.innerHTML = `
-                    <div class="drag-handle" style="position:absolute; top:10px; right:10px; cursor:grab; color:var(--text-dim);"><i class="fa-solid fa-grip-vertical"></i></div>
                     <input type="text" class="edit-input" placeholder="ชื่อรายการ" value="${item.name}" onchange="updateItem(${item.id}, 'name', this.value)">
                     <input type="number" class="edit-input" placeholder="เลขไมล์ถัดไป" value="${item.nextKm}" onchange="updateItem(${item.id}, 'nextKm', this.value)">
                     <input type="text" class="edit-input" placeholder="หมายเหตุ" value="${item.note}" onchange="updateItem(${item.id}, 'note', this.value)">
