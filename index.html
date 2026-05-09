@@ -102,9 +102,9 @@
         .card-note { 
             margin-top: 10px; font-size: 0.85rem; padding: 8px; 
             background: rgba(0,0,0,0.2); border-radius: 8px; color: var(--primary);
+            line-height: 1.4;
         }
 
-        /* Drag Style */
         .drag-handle {
             position: absolute; top: 10px; right: 10px;
             padding: 10px; color: var(--text-dim); cursor: grab;
@@ -137,6 +137,9 @@
         .volt-badge {
             display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 0.75rem; margin-right: 5px;
         }
+
+        .consump-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .consump-item { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px; text-align: center; }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -170,7 +173,6 @@
                 <button class="btn btn-save" onclick="saveAllToFirebase()"><i class="fa-solid fa-cloud-arrow-up"></i> บันทึก</button>
             </div>
         </div>
-        <!-- เพิ่ม id "maintenanceGrid" เพื่อใช้กับ SortableJS -->
         <div id="maintenanceGrid"></div>
     </div>
 
@@ -191,6 +193,27 @@
     </div>
 
     <div id="manual" class="tab-content">
+        <!-- ลมยาง & อัตราสิ้นเปลือง -->
+        <div class="card" style="border-left-color: var(--success);">
+            <h3><i class="fa-solid fa-gauge-high"></i> ข้อมูลล้อและยาง</h3>
+            <div class="card-note">
+                <strong>Size:</strong> 195/55 R15 / 85H<br>
+                <strong>หน้า:</strong> 34 PSI | <strong>หลัง:</strong> 33 PSI
+            </div>
+            <div class="consump-grid">
+                <div class="consump-item">
+                    <div style="font-size: 0.7rem; color: var(--text-dim);">ในเมือง</div>
+                    <div style="color: var(--warning); font-weight: bold;">10-12</div>
+                    <div style="font-size: 0.6rem;">km/L</div>
+                </div>
+                <div class="consump-item">
+                    <div style="font-size: 0.7rem; color: var(--text-dim);">นอกเมือง</div>
+                    <div style="color: var(--success); font-weight: bold;">15-16</div>
+                    <div style="font-size: 0.6rem;">km/L</div>
+                </div>
+            </div>
+        </div>
+
         <div class="card" style="border-left-color: var(--accent);">
             <h3><i class="fa-solid fa-wrench"></i> ค่าแรงขันน็อต (Torque)</h3>
             <table class="data-table">
@@ -201,6 +224,18 @@
                 <tr><td>น็อตล้อ (จริง)</td><td>112 Nm</td></tr>
             </table>
         </div>
+
+        <div class="card" style="border-left-color: var(--danger);">
+            <h3><i class="fa-solid fa-triangle-exclamation"></i> จุดที่ต้องระวัง (Vios Gen 1)</h3>
+            <div class="card-note" style="color: #fff; font-size: 0.8rem;">
+                • <strong>ระบบน้ำ:</strong> วาวน้ำ, ปั้มน้ำ, หม้อน้ำ, ข้ออ่อน (เปลี่ยนทุก 4-5 ปี)<br>
+                • <strong>ช่วงล่าง:</strong> ยางรองโช้ค ขาดบ่อย<br>
+                • <strong>เครื่องกระตุก:</strong> เช็ค คอยล์ > หัวเทียน > หัวฉีด<br>
+                • <strong>แอร์ไม่เย็น:</strong> เช็คหน้าครัชคอมแอร์ก่อนอันดับแรก<br>
+                • <strong>ตัวถัง:</strong> กระจกไฟฟ้าชอบตกร่อง
+            </div>
+        </div>
+
         <div class="card" style="border-left-color: var(--primary);">
             <h3><i class="fa-solid fa-key"></i> ตั้งค่ารีโมท & กันขโมย</h3>
             <div class="card-note" style="color: white; line-height: 1.6;">
@@ -259,15 +294,13 @@
         document.getElementById('adminPanel').style.display = isAdmin ? 'flex' : 'none';
         renderMaintenance(document.getElementById('currentMileage').value);
         
-        // จัดการระบบลากวาง
         const el = document.getElementById('maintenanceGrid');
         if (isAdmin) {
             sortableInstance = new Sortable(el, {
                 animation: 150,
-                handle: '.drag-handle', // ลากได้เฉพาะตรงไอคอน 6 จุด
+                handle: '.drag-handle',
                 ghostClass: 'sortable-ghost',
                 onEnd: function() {
-                    // เมื่อลากเสร็จ ให้อัปเดตลำดับใน maintenanceData
                     const newOrder = [];
                     el.querySelectorAll('.card').forEach(card => {
                         const id = parseInt(card.getAttribute('data-id'));
