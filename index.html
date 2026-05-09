@@ -100,46 +100,34 @@
         .rem-val { font-size: 1.4rem; font-weight: bold; margin-bottom: 5px; }
         .card-meta { font-size: 0.8rem; color: var(--text-dim); }
         .card-note { 
-            margin-top: 10px; font-size: 0.85rem; padding: 8px; 
+            margin-top: 10px; font-size: 0.85rem; padding: 10px; 
             background: rgba(0,0,0,0.2); border-radius: 8px; color: var(--primary);
-            line-height: 1.4;
+            line-height: 1.5;
         }
-
-        .drag-handle {
-            position: absolute; top: 10px; right: 10px;
-            padding: 10px; color: var(--text-dim); cursor: grab;
-            font-size: 1.2rem;
-        }
-        .sortable-ghost { opacity: 0.4; background: var(--accent) !important; }
 
         .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
-        .data-table td { padding: 12px 8px; border-bottom: 1px solid #334155; }
-        .data-table td:last-child { text-align: right; font-weight: bold; color: var(--primary); }
+        .data-table td { padding: 12px 8px; border-bottom: 1px solid #334155; vertical-align: top; }
+        .data-table td:last-child { text-align: right; }
 
-        .admin-controls { margin-top: 15px; display: none; gap: 10px; justify-content: center; }
-        .btn {
-            padding: 10px 18px; border-radius: 10px; border: none; 
-            font-weight: bold; cursor: pointer; font-size: 0.9rem;
-        }
-        .btn-add { background: var(--accent); color: white; }
-        .btn-save { background: var(--success); color: white; }
-        .btn-edit-toggle { position: absolute; top: 15px; right: 15px; font-size: 1.2rem; background: none; border: none; color: var(--text-dim); cursor: pointer; }
-
-        input[type="text"], input[type="number"].edit-input {
-            width: 100%; background: #0f172a; border: 1px solid #334155;
-            color: white; padding: 10px; border-radius: 8px; margin-top: 8px;
-        }
+        .badge-grid { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+        .status-badge { padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; color: white; display: inline-block; font-weight: bold; }
+        .bg-ok { background: var(--success); }
+        .bg-warn { background: var(--warning); }
+        .bg-crit { background: var(--danger); }
 
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .volt-badge {
-            display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 0.75rem; margin-right: 5px;
-        }
-
         .consump-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .consump-item { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px; text-align: center; }
+        
+        .admin-controls { margin-top: 15px; display: none; gap: 10px; justify-content: center; }
+        .btn { padding: 10px 18px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
+        .btn-add { background: var(--accent); color: white; }
+        .btn-save { background: var(--success); color: white; }
+        .btn-edit-toggle { position: absolute; top: 15px; right: 15px; font-size: 1.2rem; background: none; border: none; color: var(--text-dim); cursor: pointer; }
+        input.edit-input { width: 100%; background: #0f172a; border: 1px solid #334155; color: white; padding: 10px; border-radius: 8px; margin-top: 8px; }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -178,22 +166,51 @@
 
     <div id="battery" class="tab-content">
         <div class="card" style="border-left-color: var(--primary);">
-            <h3 style="color: var(--primary);"><i class="fa-solid fa-bolt"></i> แบตเตอรี่ 46B24L</h3>
+            <h3 style="color: var(--primary);"><i class="fa-solid fa-bolt"></i> แบตเตอรี่ 46B24L (12V)</h3>
             <table class="data-table">
-                <tr><td>แรงดันแบตเตอรี่ (Off)</td><td>> 12.5v</td></tr>
-                <tr><td>สตาร์ทเตอร์เทส</td><td>> 10.3v</td></tr>
-                <tr><td>ไดชาร์จ (Engine On)</td><td>> 13.3v</td></tr>
+                <tr>
+                    <td>แรงดันไฟฟ้า (ดับเครื่อง)<br><small style="color:var(--text-dim)">Battery Voltage</small></td>
+                    <td>
+                        <div class="badge-grid">
+                            <span class="status-badge bg-ok">> 12.5v ปกติ</span>
+                            <span class="status-badge bg-warn">12.0 - 12.5v เฝ้าระวัง</span>
+                            <span class="status-badge bg-crit">< 12.0v เปลี่ยนทันที</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>สตาร์ทเตอร์เทส<br><small style="color:var(--text-dim)">Starter Test</small></td>
+                    <td>
+                        <div class="badge-grid">
+                            <span class="status-badge bg-ok">> 10.3v ปกติ</span>
+                            <span class="status-badge bg-warn">9.6 - 10.3v เฝ้าระวัง</span>
+                            <span class="status-badge bg-crit">< 9.6v เปลี่ยนทันที</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>ไดชาร์จ (ติดเครื่อง)<br><small style="color:var(--text-dim)">Alternator Output</small></td>
+                    <td>
+                        <div class="badge-grid">
+                            <span class="status-badge bg-ok">> 13.3v ปกติ</span>
+                            <span class="status-badge bg-warn">12.5 - 13.3v เฝ้าระวัง</span>
+                            <span class="status-badge bg-crit">< 12.5v เปลี่ยนทันที</span>
+                        </div>
+                    </td>
+                </tr>
             </table>
-            <div style="margin-top: 15px; font-size: 0.8rem;">
-                <span class="volt-badge" style="background: var(--success);">ปกติ</span>
-                <span class="volt-badge" style="background: var(--warning);">เฝ้าระวัง</span>
-                <span class="volt-badge" style="background: var(--danger);">เปลี่ยนทันที</span>
-            </div>
         </div>
     </div>
 
     <div id="manual" class="tab-content">
-        <!-- ลมยาง & อัตราสิ้นเปลือง -->
+        <div class="card" style="border-left-color: var(--primary);">
+            <h3><i class="fa-solid fa-car"></i> ข้อมูลพื้นฐานรถยนต์</h3>
+            <div class="card-note" style="color: #fff; word-break: break-all;">
+                <strong>เลขเครื่อง:</strong> MR053HY4204125912<br>
+                <strong>วันที่ออกรถ:</strong> 29 เมษายน 2566
+            </div>
+        </div>
+
         <div class="card" style="border-left-color: var(--success);">
             <h3><i class="fa-solid fa-gauge-high"></i> ข้อมูลล้อและยาง</h3>
             <div class="card-note">
@@ -234,19 +251,6 @@
                 • <strong>แอร์ไม่เย็น:</strong> เช็คหน้าครัชคอมแอร์ก่อนอันดับแรก<br>
                 • <strong>ตัวถัง:</strong> กระจกไฟฟ้าชอบตกร่อง
             </div>
-        </div>
-
-        <div class="card" style="border-left-color: var(--primary);">
-            <h3><i class="fa-solid fa-key"></i> ตั้งค่ารีโมท & กันขโมย</h3>
-            <div class="card-note" style="color: white; line-height: 1.6;">
-                1. เปิดประตูค้างไว้ <br>
-                2. บิดกุญแจ Acc ↔ On (5 ครั้ง) <br>
-                3. ไฟ Security ค้าง → กด Lock (ไฟดับ) <br>
-                4. กดปุ่ม Lock ไฟสีแดงจะกระพริบ <br>
-                5. ปิดประตู บิดกุญแจกลับ ดึงกุญเเจออก <br>
-                6. ทดสอบใช้งานรีโมทที่ Copy
-            </div>
-            <p class="card-meta" style="margin-top: 10px;">* ปิดเสียงกันขโมย: ปลดล็อค + ปุ่มเสียง ค้างไว้</p>
         </div>
     </div>
 </div>
@@ -339,11 +343,11 @@
                 `;
             } else {
                 card.innerHTML = `
-                    <div class="drag-handle"><i class="fa-solid fa-grip-vertical"></i></div>
+                    <div class="drag-handle" style="position:absolute; top:10px; right:10px; cursor:grab; color:var(--text-dim);"><i class="fa-solid fa-grip-vertical"></i></div>
                     <input type="text" class="edit-input" placeholder="ชื่อรายการ" value="${item.name}" onchange="updateItem(${item.id}, 'name', this.value)">
                     <input type="number" class="edit-input" placeholder="เลขไมล์ถัดไป" value="${item.nextKm}" onchange="updateItem(${item.id}, 'nextKm', this.value)">
                     <input type="text" class="edit-input" placeholder="หมายเหตุ" value="${item.note}" onchange="updateItem(${item.id}, 'note', this.value)">
-                    <button onclick="deleteItem(${item.id})" style="background:none; border:none; color:var(--danger); margin-top:15px; cursor:pointer; font-size:0.9rem;"><i class="fa-solid fa-trash-can"></i> ลบรายการนี้</button>
+                    <button onclick="deleteItem(${item.id})" style="background:none; border:none; color:var(--danger); margin-top:15px; cursor:pointer;"><i class="fa-solid fa-trash-can"></i> ลบรายการนี้</button>
                 `;
             }
             grid.appendChild(card);
@@ -369,7 +373,7 @@
 
     function saveAllToFirebase() {
         db.ref('vios_data/items').set(maintenanceData).then(() => {
-            alert("บันทึกลำดับและข้อมูลสำเร็จ!");
+            alert("บันทึกสำเร็จ!");
             toggleAdmin();
         });
     }
