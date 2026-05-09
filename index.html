@@ -7,6 +7,8 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <!-- SortableJS for Drag and Drop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     
     <style>
         :root {
@@ -102,6 +104,14 @@
             background: rgba(0,0,0,0.2); border-radius: 8px; color: var(--primary);
         }
 
+        /* Drag Style */
+        .drag-handle {
+            position: absolute; top: 10px; right: 10px;
+            padding: 10px; color: var(--text-dim); cursor: grab;
+            font-size: 1.2rem;
+        }
+        .sortable-ghost { opacity: 0.4; background: var(--accent) !important; }
+
         .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
         .data-table td { padding: 12px 8px; border-bottom: 1px solid #334155; }
         .data-table td:last-child { text-align: right; font-weight: bold; color: var(--primary); }
@@ -117,7 +127,7 @@
 
         input[type="text"], input[type="number"].edit-input {
             width: 100%; background: #0f172a; border: 1px solid #334155;
-            color: white; padding: 8px; border-radius: 5px; margin-top: 5px;
+            color: white; padding: 10px; border-radius: 8px; margin-top: 8px;
         }
 
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
@@ -160,6 +170,7 @@
                 <button class="btn btn-save" onclick="saveAllToFirebase()"><i class="fa-solid fa-cloud-arrow-up"></i> บันทึก</button>
             </div>
         </div>
+        <!-- เพิ่ม id "maintenanceGrid" เพื่อใช้กับ SortableJS -->
         <div id="maintenanceGrid"></div>
     </div>
 
@@ -219,6 +230,7 @@
     const db = firebase.database();
     let maintenanceData = [];
     let isAdmin = false;
+    let sortableInstance = null;
 
     db.ref('vios_data').on('value', (snap) => {
         const data = snap.val();
@@ -245,6 +257,31 @@
         isAdmin = !isAdmin;
         document.getElementById('adminPanel').style.display = isAdmin ? 'flex' : 'none';
         renderMaintenance(document.getElementById('currentMileage').value);
+        
+        // จัดการระบบลากวาง
+        const el = document.getElementById('maintenanceGrid');
+        if (isAdmin) {
+            sortableInstance = new Sortable(el, {
+                animation: 150,
+                handle: '.drag-handle', // ลากได้เฉพาะตรงไอคอน 6 จุด
+                ghostClass: 'sortable-ghost',
+                onEnd: function() {
+                    // เมื่อลากเสร็จ ให้อัปเดตลำดับใน maintenanceData
+                    const newOrder = [];
+                    el.querySelectorAll('.card').forEach(card => {
+                        const id = parseInt(card.getAttribute('data-id'));
+                        const item = maintenanceData.find(x => x.id === id);
+                        if (item) newOrder.push(item);
+                    });
+                    maintenanceData = newOrder;
+                }
+            });
+        } else {
+            if (sortableInstance) {
+                sortableInstance.destroy();
+                sortableInstance = null;
+            }
+        }
     }
 
     function renderMaintenance(current) {
@@ -255,6 +292,7 @@
             const status = rem <= 0 ? 'status-danger' : (rem <= 2000 ? 'status-warning' : 'status-ok');
             const card = document.createElement('div');
             card.className = `card ${status}`;
+            card.setAttribute('data-id', item.id);
             
             if(!isAdmin) {
                 card.innerHTML = `
@@ -267,10 +305,11 @@
                 `;
             } else {
                 card.innerHTML = `
-                    <input type="text" class="edit-input" value="${item.name}" onchange="updateItem(${item.id}, 'name', this.value)">
-                    <input type="number" class="edit-input" value="${item.nextKm}" onchange="updateItem(${item.id}, 'nextKm', this.value)">
-                    <input type="text" class="edit-input" value="${item.note}" onchange="updateItem(${item.id}, 'note', this.value)">
-                    <button onclick="deleteItem(${item.id})" style="background:none; border:none; color:var(--danger); margin-top:10px; cursor:pointer;"><i class="fa-solid fa-trash"></i> ลบรายการ</button>
+                    <div class="drag-handle"><i class="fa-solid fa-grip-vertical"></i></div>
+                    <input type="text" class="edit-input" placeholder="ชื่อรายการ" value="${item.name}" onchange="updateItem(${item.id}, 'name', this.value)">
+                    <input type="number" class="edit-input" placeholder="เลขไมล์ถัดไป" value="${item.nextKm}" onchange="updateItem(${item.id}, 'nextKm', this.value)">
+                    <input type="text" class="edit-input" placeholder="หมายเหตุ" value="${item.note}" onchange="updateItem(${item.id}, 'note', this.value)">
+                    <button onclick="deleteItem(${item.id})" style="background:none; border:none; color:var(--danger); margin-top:15px; cursor:pointer; font-size:0.9rem;"><i class="fa-solid fa-trash-can"></i> ลบรายการนี้</button>
                 `;
             }
             grid.appendChild(card);
@@ -283,12 +322,12 @@
     }
 
     function addNewItem() {
-        maintenanceData.push({ id: Date.now(), name: "ใหม่", nextKm: 0, note: "" });
+        maintenanceData.push({ id: Date.now(), name: "", nextKm: 0, note: "" });
         renderMaintenance(document.getElementById('currentMileage').value);
     }
 
     function deleteItem(id) {
-        if(confirm('ลบรายการนี้?')) {
+        if(confirm('ยืนยันการลบ?')) {
             maintenanceData = maintenanceData.filter(x => x.id !== id);
             renderMaintenance(document.getElementById('currentMileage').value);
         }
@@ -296,7 +335,7 @@
 
     function saveAllToFirebase() {
         db.ref('vios_data/items').set(maintenanceData).then(() => {
-            alert("บันทึกแล้ว");
+            alert("บันทึกลำดับและข้อมูลสำเร็จ!");
             toggleAdmin();
         });
     }
