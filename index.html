@@ -3,127 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Vios 2005 Pro Dashboard</title>
-    <!-- Firebase SDK -->
+    <title>VIOS 2005 - Total Control</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-    <!-- SortableJS for Drag and Drop -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     
     <style>
         :root {
-            --bg: #0f172a;
-            --card-bg: #1e293b;
-            --primary: #38bdf8;
-            --success: #22c55e;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --text-main: #f8fafc;
-            --text-dim: #94a3b8;
-            --accent: #8b5cf6;
+            --bg: #0f172a; --card-bg: #1e293b; --primary: #38bdf8;
+            --success: #22c55e; --warning: #f59e0b; --danger: #ef4444;
+            --text-main: #f8fafc; --text-dim: #94a3b8; --accent: #8b5cf6;
         }
-
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            font-family: 'Chakra Petch', sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text-main);
-            margin: 0; padding: 0;
-            padding-bottom: 80px; 
-        }
-
+        body { font-family: 'Chakra Petch', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; padding-bottom: 80px; }
         .container { max-width: 800px; margin: 0 auto; padding: 15px; }
-
-        header {
-            padding: 20px 0;
-            text-align: center;
-            border-bottom: 1px solid #334155;
-            margin-bottom: 20px;
-            position: relative;
-        }
+        
+        /* Header & Tabs */
+        header { padding: 20px 0; text-align: center; border-bottom: 1px solid #334155; margin-bottom: 20px; position: relative; }
         header h1 { margin: 0; font-size: 1.5rem; color: var(--primary); letter-spacing: 1px; }
-
-        .mileage-box {
-            background: linear-gradient(145deg, #1e293b, #0f172a);
-            padding: 25px;
-            border-radius: 20px;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            margin-bottom: 25px;
-            border: 1px solid #334155;
-        }
-        .mileage-box label { display: block; color: var(--text-dim); margin-bottom: 10px; font-size: 0.9rem; }
-        .mileage-input {
-            background: transparent;
-            border: none;
-            border-bottom: 2px solid var(--primary);
-            color: var(--text-main);
-            font-size: 2.5rem;
-            width: 100%;
-            max-width: 250px;
-            text-align: center;
-            outline: none;
-            font-weight: bold;
-        }
-
-        .tabs {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(30, 41, 59, 0.95);
-            backdrop-filter: blur(10px);
-            display: flex; justify-content: space-around;
-            padding: 10px 0; border-top: 1px solid #334155;
-            z-index: 1000;
-        }
-        .tab-btn {
-            background: none; border: none; color: var(--text-dim);
-            font-size: 0.75rem; display: flex; flex-direction: column;
-            align-items: center; cursor: pointer; transition: 0.3s;
-        }
+        .tabs { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #334155; z-index: 1000; }
+        .tab-btn { background: none; border: none; color: var(--text-dim); font-size: 0.75rem; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.3s; }
         .tab-btn.active { color: var(--primary); }
         .tab-btn i { font-size: 1.2rem; margin-bottom: 4px; }
 
-        .card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 18px;
-            margin-bottom: 15px;
-            border-left: 5px solid var(--text-dim);
-            transition: 0.3s;
-            position: relative;
-        }
-        .card h3 { margin: 0 0 10px 0; font-size: 1.1rem; }
+        /* Cards */
+        .card { background: var(--card-bg); border-radius: 16px; padding: 18px; margin-bottom: 15px; border-left: 5px solid var(--text-dim); position: relative; transition: 0.3s; }
+        .card h3 { margin: 0 0 10px 0; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
         .card.status-ok { border-left-color: var(--success); }
         .card.status-warning { border-left-color: var(--warning); }
         .card.status-danger { border-left-color: var(--danger); }
-
+        .card-note { margin-top: 10px; font-size: 0.85rem; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; color: var(--primary); line-height: 1.5; }
+        
+        /* Maintenance Content */
+        .mileage-box { background: linear-gradient(145deg, #1e293b, #0f172a); padding: 25px; border-radius: 20px; text-align: center; margin-bottom: 25px; border: 1px solid #334155; }
+        .mileage-input { background: transparent; border: none; border-bottom: 2px solid var(--primary); color: var(--text-main); font-size: 2.5rem; width: 100%; max-width: 250px; text-align: center; outline: none; font-weight: bold; }
         .rem-val { font-size: 1.4rem; font-weight: bold; margin-bottom: 5px; }
-        .card-meta { font-size: 0.8rem; color: var(--text-dim); }
-        .card-note { 
-            margin-top: 10px; font-size: 0.85rem; padding: 10px; 
-            background: rgba(0,0,0,0.2); border-radius: 8px; color: var(--primary);
-            line-height: 1.5;
-        }
 
+        /* Tables & Lists */
         .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
-        .data-table td { padding: 12px 8px; border-bottom: 1px solid #334155; vertical-align: top; }
-        .data-table td:last-child { text-align: right; }
-
+        .data-table td { padding: 10px 8px; border-bottom: 1px solid #334155; }
+        .data-table td:last-child { text-align: right; font-weight: bold; color: var(--primary); }
         .badge-grid { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
-        .status-badge { padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; color: white; display: inline-block; font-weight: bold; }
-        .bg-ok { background: var(--success); }
-        .bg-warn { background: var(--warning); }
-        .bg-crit { background: var(--danger); }
+        .status-badge { padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; color: white; font-weight: bold; }
+        
+        /* New Grids */
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .info-item { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px; text-align: center; }
+        .info-label { font-size: 0.7rem; color: var(--text-dim); margin-bottom: 5px; }
+        .info-val { font-weight: bold; font-size: 1.1rem; }
 
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .consump-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .consump-item { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px; text-align: center; }
-
         .admin-controls { margin-top: 15px; display: none; gap: 10px; justify-content: center; }
-        .btn { padding: 10px 18px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
+        .btn { padding: 10px 18px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; }
         .btn-add { background: var(--accent); color: white; }
         .btn-save { background: var(--success); color: white; }
         .btn-edit-toggle { position: absolute; top: 15px; right: 15px; font-size: 1.2rem; background: none; border: none; color: var(--text-dim); cursor: pointer; }
@@ -141,60 +75,56 @@
     </header>
 
     <nav class="tabs">
-        <button class="tab-btn active" onclick="openTab('maintenance', this)">
-            <i class="fa-solid fa-oil-can"></i>บำรุงรักษา
-        </button>
-        <button class="tab-btn" onclick="openTab('battery', this)">
-            <i class="fa-solid fa-battery-three-quarters"></i>แบตเตอรี่
-        </button>
-        <button class="tab-btn" onclick="openTab('manual', this)">
-            <i class="fa-solid fa-book"></i>คู่มือ/ทอร์ค
-        </button>
+        <button class="tab-btn active" onclick="openTab('maintenance', this)"><i class="fa-solid fa-oil-can"></i>บำรุงรักษา</button>
+        <button class="tab-btn" onclick="openTab('battery', this)"><i class="fa-solid fa-bolt"></i>แบตเตอรี่</button>
+        <button class="tab-btn" onclick="openTab('manual', this)"><i class="fa-solid fa-book"></i>คู่มือ</button>
     </nav>
 
+    <!-- Tab 1: Maintenance -->
     <div id="maintenance" class="tab-content active">
         <div class="mileage-box">
-            <label>CURRENT ODOMETER (KM)</label>
+            <label style="color: var(--text-dim); font-size: 0.8rem;">ODOMETER (KM)</label>
             <input type="number" id="currentMileage" class="mileage-input" oninput="saveMileage(this.value)">
             <div id="adminPanel" class="admin-controls">
-                <button class="btn btn-add" onclick="addNewItem()"><i class="fa-solid fa-plus"></i> เพิ่มหัวข้อ</button>
-                <button class="btn btn-save" onclick="saveAllToFirebase()"><i class="fa-solid fa-cloud-arrow-up"></i> บันทึก</button>
+                <button class="btn btn-add" onclick="addNewItem()"><i class="fa-solid fa-plus"></i> เพิ่ม</button>
+                <button class="btn btn-save" onclick="saveAll()"><i class="fa-solid fa-cloud-arrow-up"></i> บันทึก</button>
             </div>
         </div>
         <div id="maintenanceGrid"></div>
     </div>
 
+    <!-- Tab 2: Battery -->
     <div id="battery" class="tab-content">
         <div class="card" style="border-left-color: var(--primary);">
-            <h3 style="color: var(--primary);"><i class="fa-solid fa-bolt"></i> แบตเตอรี่ 46B24L (12V)</h3>
+            <h3><i class="fa-solid fa-car-battery"></i> ระบบไฟ 46B24L</h3>
             <table class="data-table">
                 <tr>
-                    <td>แรงดันไฟฟ้า (ดับเครื่อง)</td>
+                    <td>แรงดัน (Off)<br><small>Battery</small></td>
                     <td>
                         <div class="badge-grid">
-                            <span class="status-badge bg-ok">> 12.5v ปกติ</span>
-                            <span class="status-badge bg-warn">12.0 - 12.5v เฝ้าระวัง</span>
-                            <span class="status-badge bg-crit">< 12.0v เปลี่ยนทันที</span>
+                            <span class="status-badge" style="background:var(--success)">>12.5v ปกติ</span>
+                            <span class="status-badge" style="background:var(--warning)">12-12.5v เฝ้าระวัง</span>
+                            <span class="status-badge" style="background:var(--danger)"><12v เปลี่ยน</span>
                         </div>
                     </td>
                 </tr>
                 <tr>
-                    <td>สตาร์ทเตอร์เทส</td>
+                    <td>Starter Test<br><small>ตอนสตาร์ท</small></td>
                     <td>
                         <div class="badge-grid">
-                            <span class="status-badge bg-ok">> 10.3v ปกติ</span>
-                            <span class="status-badge bg-warn">9.6 - 10.3v เฝ้าระวัง</span>
-                            <span class="status-badge bg-crit">< 9.6v เปลี่ยนทันที</span>
+                            <span class="status-badge" style="background:var(--success)">>10.3v ปกติ</span>
+                            <span class="status-badge" style="background:var(--warning)">9.6-10.3v เฝ้าระวัง</span>
+                            <span class="status-badge" style="background:var(--danger)"><9.6v เปลี่ยน</span>
                         </div>
                     </td>
                 </tr>
                 <tr>
-                    <td>ไดชาร์จ (ติดเครื่อง)</td>
+                    <td>ไดชาร์จ (On)<br><small>Alternator</small></td>
                     <td>
                         <div class="badge-grid">
-                            <span class="status-badge bg-ok">> 13.3v ปกติ</span>
-                            <span class="status-badge bg-warn">12.5 - 13.3v เฝ้าระวัง</span>
-                            <span class="status-badge bg-crit">< 12.5v เปลี่ยนทันที</span>
+                            <span class="status-badge" style="background:var(--success)">>13.3v ปกติ</span>
+                            <span class="status-badge" style="background:var(--warning)">12.5-13.3v เฝ้าระวัง</span>
+                            <span class="status-badge" style="background:var(--danger)"><12.5v เปลี่ยน</span>
                         </div>
                     </td>
                 </tr>
@@ -202,52 +132,86 @@
         </div>
     </div>
 
+    <!-- Tab 3: Manual -->
     <div id="manual" class="tab-content">
         <!-- ข้อมูลพื้นฐาน -->
         <div class="card" style="border-left-color: var(--primary);">
-            <h3><i class="fa-solid fa-car"></i> ข้อมูลพื้นฐานรถยนต์</h3>
-            <div class="card-note" style="color: #fff; word-break: break-all;">
+            <h3><i class="fa-solid fa-address-card"></i> ข้อมูลประจำรถ</h3>
+            <div class="card-note" style="color:white;">
                 <strong>เลขเครื่อง:</strong> MR053HY4204125912<br>
-                <strong>วันที่ออกรถ:</strong> 29 เมษายน 2566
+                <strong>วันที่ออกรถ:</strong> 29-04-2566
             </div>
         </div>
 
-        <!-- ตั้งค่ารีโมท -->
+        <!-- ลมยาง & น้ำมัน -->
+        <div class="card" style="border-left-color: var(--success);">
+            <h3><i class="fa-solid fa-gas-pump"></i> ลมยาง & การกินน้ำมัน</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">หน้า / หลัง</div>
+                    <div class="info-val" style="color:var(--primary)">34 / 33</div>
+                    <div class="info-label">PSI</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">ในเมือง</div>
+                    <div class="info-val" style="color:var(--warning)">10 - 12</div>
+                    <div class="info-label">km/L</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">นอกเมือง</div>
+                    <div class="info-val" style="color:var(--success)">15 - 16</div>
+                    <div class="info-label">km/L</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">ความจุถัง</div>
+                    <div class="info-val">45</div>
+                    <div class="info-label">Liters</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- รีโมท -->
         <div class="card" style="border-left-color: var(--accent);">
-            <h3><i class="fa-solid fa-key"></i> ตั้งค่ารีโมท 315MHz</h3>
-            <div class="card-note" style="color: white; line-height: 1.6;">
+            <h3><i class="fa-solid fa-key"></i> Remote 315 & ปิดเสียง</h3>
+            <div class="card-note" style="color:white; font-size: 0.8rem;">
+                <strong>Copy Remote:</strong><br>
                 1. เปิดประตูฝั่งคนขับค้างไว้ <br>
                 2. บิดกุญแจไปที่ Acc ↔ On (5 ครั้ง) <br>
                 3. ไฟ Security ค้าง → กด Lock ที่รีโมทใหม่ (ไฟดับ) <br>
                 4. กดปุ่ม Lock ไฟสีแดงจะกระพริบยืนยัน <br>
-                5. ปิดประตู บิดกุญแจกลับ ดึงกุญเเจออกเพื่อจบขั้นตอน
+                5. ปิดประตู บิดกุญแจกลับ ดึงกุญเเจออกเพื่อจบขั้นตอน <br>
                 6. ทดสอบใช้งานรีโมท Copy
             </div>
-            <div class="card-note" style="background: rgba(239, 68, 68, 0.2); border-radius: 8px; margin-top: 10px; color: #fff;">
-                <strong>วิธีปิดเสียงกันขโมย:</strong> <br>
-                กดปุ่ม [ปลดล็อค] + [ปุ่มรูปเสียง/ลำโพง] ค้างไว้พร้อมกันจนกว่าไฟจะตอบรับ
+            <div class="card-note" style="background:rgba(239, 68, 68, 0.2); color:white;">
+                <strong>วิธีปิดเสียง:</strong> กด [ปลดล็อค] + [ปุ่มลำโพง] พร้อมกันจนไฟกระพริบตอบรับ
             </div>
         </div>
 
-        <!-- ค่าทอร์ค -->
+        <!-- ข้อเสีย & จุดอ่อน (Expanded) -->
+        <div class="card" style="border-left-color: var(--danger);">
+            <h3><i class="fa-solid fa-circle-exclamation"></i> จุดอ่อนที่ต้องเฝ้าระวัง</h3>
+            <div class="card-note" style="color:white; font-size: 0.8rem; line-height: 1.6;">
+                • <strong>ระบบระบายน้ำ:</strong> วาล์วน้ำ/ปั๊มน้ำ/ฝาหม้อน้ำ มักตายที่ 1.5 แสนโล หรือทุกๆ 4-5 ปี (ควรเปลี่ยนยกระบบ)<br>
+                • <strong>ช่วงล่าง:</strong> ยางรองโช้คหน้าขาดง่าย และลูกปืนล้อหลังชอบหอน<br>
+                • <strong>เครื่องยนต์:</strong> ยางแท่นเครื่องทรุดทำให้สั่นสยอง, คอยล์จุดระเบิดรั่ว/เสื่อม<br>
+                • <strong>เบรก:</strong> สลักเบรกแห้ง/ตาย ทำให้เบรกดังหรือกินผ้าเบรกไม่เท่ากัน<br>
+                • <strong>แอร์:</strong> หน้าครัชคอมแอร์ไหม้ และตู้แอร์รั่วง่ายถ้าไม่ล้าง<br>
+                • <strong>ตัวถัง:</strong> กระจกหน้าฝั่งคนขับตกร่องเฟืองพลาสติกแตก
+            </div>
+        </div>
+
+        <!-- ทอร์ค -->
         <div class="card" style="border-left-color: var(--warning);">
-            <h3><i class="fa-solid fa-wrench"></i> ค่าแรงขันน็อต (Torque)</h3>
+            <h3><i class="fa-solid fa-wrench"></i> ค่าแรงขัน (Torque)</h3>
             <table class="data-table">
                 <tr><td>น็อตน้ำมันเครื่อง</td><td>39 Nm</td></tr>
                 <tr><td>น็อตน้ำมันเกียร์</td><td>49 Nm</td></tr>
                 <tr><td>หัวเทียน</td><td>25 Nm</td></tr>
+                <tr><td>น็อตคอย</td><td>8 Nm</td></tr>
+                <tr><td>น็อตฝาสูบ</td><td>10 Nm</td></tr>
+                <tr><td>น็อตลิ้นปีกผีเสื้อ</td><td>9 Nm</td></tr>
                 <tr><td>น็อตล้อ</td><td>112 Nm</td></tr>
             </table>
-        </div>
-
-        <!-- จุดระวัง -->
-        <div class="card" style="border-left-color: var(--danger);">
-            <h3><i class="fa-solid fa-triangle-exclamation"></i> จุดที่ต้องระวัง (Vios Gen 1)</h3>
-            <div class="card-note" style="color: #fff; font-size: 0.8rem;">
-                • ระบบน้ำ: วาวน้ำ, ปั้มน้ำ, หม้อน้ำ (เปลี่ยนทุก 4-5 ปี)<br>
-                • ช่วงล่าง: ยางรองโช้ค และปีกนกชอบทรุด<br>
-                • เครื่องกระตุก: เช็ค คอยล์ > หัวเทียน > ล้างลิ้นปีกผีเสื้อ
-            </div>
         </div>
     </div>
 </div>
@@ -277,15 +241,14 @@
         }
     });
 
-    function saveMileage(val) {
-        db.ref('vios_data/currentMileage').set(parseInt(val) || 0);
-    }
+    function saveMileage(val) { db.ref('vios_data/currentMileage').set(parseInt(val) || 0); }
 
     function openTab(tabName, btn) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(tabName).classList.add('active');
         btn.classList.add('active');
+        window.scrollTo(0,0);
     }
 
     function toggleAdmin() {
@@ -307,17 +270,17 @@
                 card.innerHTML = `
                     <h3>${item.name}</h3>
                     <div class="rem-val" style="color: ${rem <= 0 ? 'var(--danger)' : (rem <= 2000 ? 'var(--warning)' : 'var(--success)')}">
-                        ${rem <= 0 ? 'OVERDUE ' + Math.abs(rem).toLocaleString() : rem.toLocaleString() + ' KM'}
+                        ${rem <= 0 ? 'OVERDUE' : rem.toLocaleString() + ' KM'}
                     </div>
-                    <div class="card-meta">NEXT: ${item.nextKm.toLocaleString()} KM</div>
+                    <div class="card-meta">Next Service: ${item.nextKm.toLocaleString()}</div>
                     ${item.note ? `<div class="card-note">${item.note}</div>` : ''}
                 `;
             } else {
                 card.innerHTML = `
-                    <input type="text" class="edit-input" placeholder="ชื่อรายการ" value="${item.name}" onchange="updateItem(${item.id}, 'name', this.value)">
-                    <input type="number" class="edit-input" placeholder="เลขไมล์ถัดไป" value="${item.nextKm}" onchange="updateItem(${item.id}, 'nextKm', this.value)">
-                    <input type="text" class="edit-input" placeholder="หมายเหตุ" value="${item.note}" onchange="updateItem(${item.id}, 'note', this.value)">
-                    <button onclick="deleteItem(${item.id})" style="background:none; border:none; color:var(--danger); margin-top:15px; cursor:pointer;"><i class="fa-solid fa-trash-can"></i> ลบรายการนี้</button>
+                    <input type="text" class="edit-input" value="${item.name}" onchange="updateItem(${item.id}, 'name', this.value)">
+                    <input type="number" class="edit-input" value="${item.nextKm}" onchange="updateItem(${item.id}, 'nextKm', this.value)">
+                    <input type="text" class="edit-input" value="${item.note}" onchange="updateItem(${item.id}, 'note', this.value)">
+                    <button onclick="deleteItem(${item.id})" style="color:var(--danger); background:none; border:none; margin-top:10px; cursor:pointer;">ลบ</button>
                 `;
             }
             grid.appendChild(card);
@@ -330,22 +293,17 @@
     }
 
     function addNewItem() {
-        maintenanceData.push({ id: Date.now(), name: "", nextKm: 0, note: "" });
+        maintenanceData.push({ id: Date.now(), name: "รายการใหม่", nextKm: 0, note: "" });
         renderMaintenance(document.getElementById('currentMileage').value);
     }
 
     function deleteItem(id) {
-        if(confirm('ยืนยันการลบ?')) {
-            maintenanceData = maintenanceData.filter(x => x.id !== id);
-            renderMaintenance(document.getElementById('currentMileage').value);
-        }
+        maintenanceData = maintenanceData.filter(x => x.id !== id);
+        renderMaintenance(document.getElementById('currentMileage').value);
     }
 
-    function saveAllToFirebase() {
-        db.ref('vios_data/items').set(maintenanceData).then(() => {
-            alert("บันทึกสำเร็จ!");
-            toggleAdmin();
-        });
+    function saveAll() {
+        db.ref('vios_data/items').set(maintenanceData).then(() => { alert("บันทึกสำเร็จ"); toggleAdmin(); });
     }
 </script>
 </body>
