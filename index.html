@@ -3,247 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vios 2005 Maintenance System</title>
+    <title>Vios 2005 Maintenance - Firebase</title>
+    <!-- Firebase SDK (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --primary: #2c3e50;
             --success: #27ae60;
             --warning: #f39c12;
             --danger: #e74c3c;
+            --admin: #8e44ad;
             --light: #f4f7f6;
         }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
-            background-color: var(--light);
-            margin: 0;
-            padding: 20px;
-            color: #333;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            background: var(--primary);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--light); padding: 20px; margin: 0; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        header { text-align: center; background: var(--primary); color: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; position: relative; }
+        
+        .admin-toggle {
+            position: absolute; top: 10px; right: 10px; background: var(--admin); color: white; border: none;
+            padding: 8px 12px; border-radius: 20px; cursor: pointer; font-size: 0.7rem;
         }
 
         .mileage-input-section {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            margin-bottom: 25px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            background: white; padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
-        input[type="number"] {
-            font-size: 1.5rem;
-            padding: 10px;
-            width: 200px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
+        input[type="number"], input[type="text"] { padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin: 5px; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+        
         .card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            border-left: 8px solid #ccc;
-            transition: transform 0.2s;
+            background: white; padding: 20px; border-radius: 12px; border-left: 8px solid #ccc;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08); position: relative;
         }
-
-        .card:hover {
-            transform: translateY(-5px);
-        }
-
         .card.status-ok { border-left-color: var(--success); }
         .card.status-warning { border-left-color: var(--warning); }
         .card.status-danger { border-left-color: var(--danger); }
 
-        .card h3 {
-            margin-top: 0;
-            color: var(--primary);
-            font-size: 1.2rem;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
+        .edit-fields { display: none; margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 10px; }
+        .admin-active .edit-fields { display: block; }
+        .admin-active .display-fields { display: none; }
 
-        .info {
-            font-size: 0.9rem;
-            margin: 8px 0;
-        }
+        .btn-save { background: var(--success); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; margin-top: 10px; display: none; }
+        .admin-active .btn-save { display: inline-block; }
 
-        .remaining {
-            font-weight: bold;
-            font-size: 1.1rem;
-            margin-top: 15px;
-        }
-
-        .note {
-            font-size: 0.8rem;
-            color: #666;
-            font-style: italic;
-            background: #f9f9f9;
-            padding: 5px;
-            border-radius: 4px;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            color: white;
-            margin-bottom: 10px;
-        }
-
-        .bg-ok { background: var(--success); }
-        .bg-warning { background: var(--warning); }
-        .bg-danger { background: var(--danger); }
+        .sync-status { font-size: 0.75rem; color: #888; margin-top: 10px; }
+        .remaining { font-weight: bold; font-size: 1.2rem; margin: 10px 0; }
+        .note { font-size: 0.85rem; color: #666; background: #f9f9f9; padding: 8px; border-radius: 5px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>Vios 2005 G1 Maintenance</h1>
-        <p>ระบบติดตามการบำรุงรักษารถยนต์</p>
+        <button class="admin-toggle" onclick="toggleAdmin()">⚙️ โหมดแก้ไข</button>
+        <h1>Vios 2005 (G1) 1.5S</h1>
+        <p>ระบบแจ้งเตือนการบำรุงรักษาผ่าน Cloud</p>
     </header>
 
     <div class="mileage-input-section">
-        <label for="currentMileage">เลขไมล์ปัจจุบันของคุณ (กม.):</label><br><br>
-        <input type="number" id="currentMileage" value="200000" oninput="calculateMaintenance()">
+        <label><b>เลขไมล์ปัจจุบัน (กม.):</b></label><br>
+        <input type="number" id="currentMileage" oninput="saveMileage(this.value)" style="font-size: 2rem; width: 280px; text-align: center;">
+        <div id="syncStatus" class="sync-status">ระบบพร้อมทำงาน...</div>
+        <button class="btn-save" onclick="saveAllToFirebase()">💾 บันทึกการแก้ไขหัวข้อลง Cloud</button>
     </div>
 
-    <div id="maintenanceGrid" class="grid">
-        </div>
+    <div id="maintenanceGrid" class="grid"></div>
 </div>
 
 <script>
-    const maintenanceData = [
-        {
-            name: "น้ำมันเครื่อง (Shell HX8 10W-40)",
-            nextKm: 212000,
-            interval: 10000,
-            note: "ปริมาณ 3.7 ลิตร / ราคา 1,650.-",
-            lastUpdate: "ล่าสุด 200,000 กม."
-        },
-        {
-            name: "น้ำมันเกียร์ (Toyota T-IV)",
-            nextKm: 240000,
-            interval: 40000,
-            note: "ปริมาณ 3.5 ลิตร (เปลี่ยนล่าสุด 22 ก.พ. 68)",
-            lastUpdate: "กรอง+ปะเก็น เปลี่ยนที่ 300,000 กม."
-        },
-        {
-            name: "น้ำมันเบรก (TRW)",
-            nextKm: 240000,
-            interval: 40000,
-            note: "ลำดับการไล่ลม: หลังซ้าย > หลังขวา > หน้าซ้าย > หน้าขวา",
-            lastUpdate: "รอบถัดไป 240,000 กม."
-        },
-        {
-            name: "น้ำมันพาวเวอร์ (Toyota)",
-            nextKm: 240000,
-            interval: 40000,
-            note: "เปลี่ยนล่าสุด 19 ก.พ. 68",
-            lastUpdate: "รอบถัดไป 240,000 กม."
-        },
-        {
-            name: "น้ำยาหล่อเย็น (Coolant)",
-            nextKm: 220000,
-            interval: 40000,
-            note: "เปลี่ยนล่าสุด 22 พ.ค. 67 (ที่ 180,000 กม.)",
-            lastUpdate: "รอบถัดไป 220,000 กม."
-        },
-        {
-            name: "สายพานหน้าเครื่อง",
-            nextKm: 270000,
-            interval: 80000,
-            note: "เปลี่ยนล่าสุด 1 ก.ย. 67 (ที่ 190,000 กม.)",
-            lastUpdate: "รอบถัดไป 270,000 กม."
-        },
-        {
-            name: "หัวเทียน (Toyota)",
-            nextKm: 240000,
-            interval: 40000,
-            note: "เปลี่ยนล่าสุด 10 ก.พ. 68 (ที่ 200,000 กม.)",
-            lastUpdate: "รอบถัดไป 240,000 กม."
-        },
-        {
-            name: "เบรกหน้า (จาน + ผ้าเบรก Nokiyo)",
-            nextKm: 999999, // บันทึกวันที่เฉยๆ
-            interval: 0,
-            note: "จัดการเมื่อวันที่ 9 พ.ค. 69",
-            lastUpdate: "เช็คสภาพตามระยะ",
-            isStatic: true
-        }
+    // 1. Firebase Configuration จากที่คุณส่งมา
+    const firebaseConfig = {
+        apiKey: "AIzaSyAgWzfe-JzSDq5Q7JTw_GuWPyl9xmLUxjM",
+        authDomain: "vios2005-30708.firebaseapp.com",
+        databaseURL: "https://vios2005-30708-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "vios2005-30708",
+        storageBucket: "vios2005-30708.firebasestorage.app",
+        messagingSenderId: "115308964965",
+        appId: "1:115308964965:web:f41907f65455acc30aea8c",
+        measurementId: "G-5HGY9M72RM"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // ข้อมูลเริ่มต้นสำหรับ Vios ของคุณ
+    const defaultData = [
+        { id: 1, name: "น้ำมันเครื่อง Shell hx8", nextKm: 212000, note: "เติม 3.7 ลิตร (10-40) 1,650.-" },
+        { id: 2, name: "น้ำมันเกียร์ T-iv", nextKm: 240000, note: "ปริมาณ 3.5 ลิตร (ล่าสุด 22 ก.พ. 68)" },
+        { id: 3, name: "น้ำมันเบรก TRW", nextKm: 240000, note: "ลำดับ: หลังซ้าย > หลังขวา > หน้าซ้าย > หน้าขวา" },
+        { id: 4, name: "น้ำมันพาวเวอร์", nextKm: 240000, note: "Toyota (ล่าสุด 19 ก.พ. 68)" },
+        { id: 5, name: "น้ำยาหล่อเย็น", nextKm: 220000, note: "Toyota (ล่าสุด 22 พ.ค. 67)" },
+        { id: 6, name: "สายพานหน้าเครื่อง", nextKm: 270000, note: "ล่าสุด 1 ก.ย. 67 (ที่ 190k กม.)" },
+        { id: 7, name: "หัวเทียน Toyota", nextKm: 240000, note: "ล่าสุด 10 ก.พ. 68" }
     ];
 
-    function calculateMaintenance() {
-        const current = parseInt(document.getElementById('currentMileage').value) || 0;
+    let maintenanceData = [];
+    let isAdmin = false;
+    let saveTimeout;
+
+    // --- ส่วนการจัดการข้อมูล ---
+
+    // ดึงข้อมูล Realtime จาก Firebase
+    db.ref('vios_data').on('value', (snapshot) => {
+        const cloudData = snapshot.val();
+        if (cloudData) {
+            maintenanceData = cloudData.items || defaultData;
+            document.getElementById('currentMileage').value = cloudData.currentMileage || 200000;
+            renderDashboard(cloudData.currentMileage || 0);
+        } else {
+            // ถ้าเป็นครั้งแรก ให้ส่งค่าเริ่มต้นขึ้นไป
+            db.ref('vios_data').set({
+                currentMileage: 200000,
+                items: defaultData
+            });
+        }
+    });
+
+    // บันทึกเฉพาะเลขไมล์ (Auto-save)
+    function saveMileage(val) {
+        const m = parseInt(val) || 0;
+        document.getElementById('syncStatus').innerText = "สถานะ: กำลังพิมพ์...";
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(() => {
+            db.ref('vios_data/currentMileage').set(m).then(() => {
+                document.getElementById('syncStatus').innerText = "สถานะ: เลขไมล์อัปเดตบน Cloud แล้ว";
+            });
+        }, 1000);
+    }
+
+    // บันทึกข้อมูลทั้งหมด (สำหรับโหมดแอดมิน)
+    function saveAllToFirebase() {
+        db.ref('vios_data/items').set(maintenanceData).then(() => {
+            alert("บันทึกข้อมูลหัวข้อต่างๆ เรียบร้อย!");
+            toggleAdmin();
+        });
+    }
+
+    // อัปเดตข้อมูลในตัวแปรชั่วคราว
+    function updateLocalData(id, field, value) {
+        const item = maintenanceData.find(d => d.id === id);
+        if (item) {
+            item[field] = (field === 'nextKm') ? parseInt(value) : value;
+        }
+    }
+
+    // --- ส่วนการแสดงผล ---
+
+    function toggleAdmin() {
+        isAdmin = !isAdmin;
+        document.body.classList.toggle('admin-active');
+        renderDashboard(document.getElementById('currentMileage').value);
+    }
+
+    function renderDashboard(current) {
         const grid = document.getElementById('maintenanceGrid');
         grid.innerHTML = '';
 
         maintenanceData.forEach(item => {
+            const remaining = item.nextKm - current;
             let statusClass = 'status-ok';
-            let badgeClass = 'bg-ok';
             let statusText = 'ปกติ';
-            let remainingText = '';
 
-            if (item.isStatic) {
-                remainingText = "บันทึกประวัติการเปลี่ยน";
-            } else {
-                const remaining = item.nextKm - current;
-                
-                if (remaining <= 0) {
-                    statusClass = 'status-danger';
-                    badgeClass = 'bg-danger';
-                    statusText = 'เกินกำหนดเปลี่ยน!';
-                    remainingText = `เกินมาแล้ว ${Math.abs(remaining).toLocaleString()} กม.`;
-                } else if (remaining <= 2000) {
-                    statusClass = 'status-warning';
-                    badgeClass = 'bg-warning';
-                    statusText = 'ใกล้ถึงกำหนด';
-                    remainingText = `เหลืออีก ${remaining.toLocaleString()} กม.`;
-                } else {
-                    remainingText = `เหลืออีก ${remaining.toLocaleString()} กม.`;
-                }
-            }
+            if (remaining <= 0) { statusClass = 'status-danger'; statusText = 'เกินกำหนด!'; }
+            else if (remaining <= 2000) { statusClass = 'status-warning'; statusText = 'ใกล้แล้ว'; }
 
             const card = document.createElement('div');
             card.className = `card ${statusClass}`;
             card.innerHTML = `
-                <span class="badge ${badgeClass}">${statusText}</span>
-                <h3>${item.name}</h3>
-                <div class="info">กำหนดที่: <strong>${item.isStatic ? '-' : item.nextKm.toLocaleString() + ' กม.'}</strong></div>
-                <div class="info">${item.lastUpdate}</div>
-                <div class="remaining">${remainingText}</div>
-                <p class="note">${item.note}</p>
+                <div class="display-fields">
+                    <span style="font-size:0.7rem; font-weight:bold; color:#888;">${statusText}</span>
+                    <h3 style="margin:5px 0;">${item.name}</h3>
+                    <div class="remaining" style="color:${remaining <= 0 ? 'var(--danger)' : 'var(--primary)'}">
+                        ${remaining <= 0 ? 'เกินมา ' + Math.abs(remaining).toLocaleString() : 'อีก ' + remaining.toLocaleString()} กม.
+                    </div>
+                    <div style="font-size:0.85rem;">กำหนด: <b>${item.nextKm.toLocaleString()} กม.</b></div>
+                    <p class="note">${item.note}</p>
+                </div>
+
+                <div class="edit-fields">
+                    <label>หัวข้อ:</label><br>
+                    <input type="text" value="${item.name}" onchange="updateLocalData(${item.id}, 'name', this.value)" style="width:90%"><br>
+                    <label>ระยะถัดไป (กม.):</label><br>
+                    <input type="number" value="${item.nextKm}" onchange="updateLocalData(${item.id}, 'nextKm', this.value)"><br>
+                    <label>หมายเหตุ:</label><br>
+                    <input type="text" value="${item.note}" onchange="updateLocalData(${item.id}, 'note', this.value)" style="width:90%">
+                </div>
             `;
             grid.appendChild(card);
         });
     }
-
-    // เรียกฟังก์ชันครั้งแรกเมื่อโหลดหน้าเว็บ
-    calculateMaintenance();
 </script>
 
 </body>
