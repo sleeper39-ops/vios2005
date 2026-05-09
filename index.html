@@ -2,80 +2,227 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vios 2005 Maintenance - Firebase</title>
-    <!-- Firebase SDK (Compat Version) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vios 2005 Dashboard</title>
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     
     <style>
         :root {
-            --primary: #2c3e50;
-            --success: #27ae60;
-            --warning: #f39c12;
-            --danger: #e74c3c;
-            --admin: #8e44ad;
-            --light: #f4f7f6;
-        }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--light); padding: 20px; margin: 0; }
-        .container { max-width: 1000px; margin: 0 auto; }
-        header { text-align: center; background: var(--primary); color: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; position: relative; }
-        
-        .admin-toggle {
-            position: absolute; top: 10px; right: 10px; background: var(--admin); color: white; border: none;
-            padding: 8px 12px; border-radius: 20px; cursor: pointer; font-size: 0.7rem;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --primary: #38bdf8;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --accent: #8b5cf6;
         }
 
-        .mileage-input-section {
-            background: white; padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: 'Chakra Petch', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text-main);
+            margin: 0; padding: 0;
+            padding-bottom: 80px; /* Space for mobile nav */
         }
 
-        input[type="number"], input[type="text"] { padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin: 5px; }
-        
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
-        
+        .container { max-width: 800px; margin: 0 auto; padding: 15px; }
+
+        /* Header */
+        header {
+            padding: 20px 0;
+            text-align: center;
+            border-bottom: 1px solid #334155;
+            margin-bottom: 20px;
+        }
+        header h1 { margin: 0; font-size: 1.5rem; color: var(--primary); letter-spacing: 1px; }
+        .sync-indicator { font-size: 0.7rem; color: var(--text-dim); margin-top: 5px; }
+
+        /* Mileage Section */
+        .mileage-box {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            margin-bottom: 25px;
+            border: 1px solid #334155;
+        }
+        .mileage-box label { display: block; color: var(--text-dim); margin-bottom: 10px; font-size: 0.9rem; }
+        .mileage-input {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--primary);
+            color: var(--text-main);
+            font-size: 2.5rem;
+            width: 100%;
+            max-width: 250px;
+            text-align: center;
+            outline: none;
+            font-weight: bold;
+        }
+
+        /* Tabs Mobile Bottom Nav */
+        .tabs {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex; justify-content: space-around;
+            padding: 10px 0; border-top: 1px solid #334155;
+            z-index: 1000;
+        }
+        .tab-btn {
+            background: none; border: none; color: var(--text-dim);
+            font-size: 0.75rem; display: flex; flex-direction: column;
+            align-items: center; cursor: pointer; transition: 0.3s;
+        }
+        .tab-btn.active { color: var(--primary); }
+        .tab-btn i { font-size: 1.2rem; margin-bottom: 4px; }
+
+        /* Maintenance Cards */
         .card {
-            background: white; padding: 20px; border-radius: 12px; border-left: 8px solid #ccc;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08); position: relative;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 15px;
+            border-left: 5px solid var(--text-dim);
+            transition: 0.3s;
+            position: relative;
         }
         .card.status-ok { border-left-color: var(--success); }
         .card.status-warning { border-left-color: var(--warning); }
         .card.status-danger { border-left-color: var(--danger); }
 
-        .edit-fields { display: none; margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 10px; }
-        .admin-active .edit-fields { display: block; }
-        .admin-active .display-fields { display: none; }
+        .card h3 { margin: 0 0 10px 0; font-size: 1.1rem; }
+        .rem-val { font-size: 1.4rem; font-weight: bold; margin-bottom: 5px; }
+        .card-meta { font-size: 0.8rem; color: var(--text-dim); }
+        .card-note { 
+            margin-top: 10px; font-size: 0.85rem; padding: 8px; 
+            background: rgba(0,0,0,0.2); border-radius: 8px; color: var(--primary);
+        }
 
-        .btn-save { background: var(--success); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; margin-top: 10px; display: none; }
-        .admin-active .btn-save { display: inline-block; }
+        /* Tables & Lists */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
+        .data-table td { padding: 12px 8px; border-bottom: 1px solid #334155; }
+        .data-table td:last-child { text-align: right; font-weight: bold; color: var(--primary); }
 
-        .sync-status { font-size: 0.75rem; color: #888; margin-top: 10px; }
-        .remaining { font-weight: bold; font-size: 1.2rem; margin: 10px 0; }
-        .note { font-size: 0.85rem; color: #666; background: #f9f9f9; padding: 8px; border-radius: 5px; }
+        /* Admin Controls */
+        .admin-controls { margin-top: 15px; display: none; gap: 10px; justify-content: center; }
+        .btn {
+            padding: 10px 18px; border-radius: 10px; border: none; 
+            font-weight: bold; cursor: pointer; font-size: 0.9rem;
+        }
+        .btn-add { background: var(--accent); color: white; }
+        .btn-save { background: var(--success); color: white; }
+        .btn-edit-toggle { position: absolute; top: 15px; right: 15px; font-size: 1.2rem; background: none; border: none; color: var(--text-dim); cursor: pointer; }
+
+        input[type="text"], input[type="number"].edit-input {
+            width: 100%; background: #0f172a; border: 1px solid #334155;
+            color: white; padding: 8px; border-radius: 5px; margin-top: 5px;
+        }
+
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .volt-badge {
+            display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 0.75rem; margin-right: 5px;
+        }
     </style>
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
 <div class="container">
     <header>
-        <button class="admin-toggle" onclick="toggleAdmin()">⚙️ โหมดแก้ไข</button>
-        <h1>Vios 2005 (G1) 1.5S</h1>
-        <p>ระบบแจ้งเตือนการบำรุงรักษาผ่าน Cloud</p>
+        <button class="btn-edit-toggle" onclick="toggleAdmin()"><i class="fa-solid fa-sliders"></i></button>
+        <h1>VIOS 2005 <span style="font-weight: normal; color: white;">G1</span></h1>
+        <div id="syncStatus" class="sync-indicator">CONNECTED</div>
     </header>
 
-    <div class="mileage-input-section">
-        <label><b>เลขไมล์ปัจจุบัน (กม.):</b></label><br>
-        <input type="number" id="currentMileage" oninput="saveMileage(this.value)" style="font-size: 2rem; width: 280px; text-align: center;">
-        <div id="syncStatus" class="sync-status">ระบบพร้อมทำงาน...</div>
-        <button class="btn-save" onclick="saveAllToFirebase()">💾 บันทึกการแก้ไขหัวข้อลง Cloud</button>
+    <!-- NAVIGATION TABS -->
+    <nav class="tabs">
+        <button class="tab-btn active" onclick="openTab('maintenance', this)">
+            <i class="fa-solid fa-oil-can"></i>บำรุงรักษา
+        </button>
+        <button class="tab-btn" onclick="openTab('battery', this)">
+            <i class="fa-solid fa-battery-three-quarters"></i>แบตเตอรี่
+        </button>
+        <button class="tab-btn" onclick="openTab('manual', this)">
+            <i class="fa-solid fa-book"></i>คู่มือ/ทอร์ค
+        </button>
+    </nav>
+
+    <!-- CONTENT: MAINTENANCE -->
+    <div id="maintenance" class="tab-content active">
+        <div class="mileage-box">
+            <label>CURRENT ODOMETER (KM)</label>
+            <input type="number" id="currentMileage" class="mileage-input" oninput="saveMileage(this.value)">
+            <div id="adminPanel" class="admin-controls">
+                <button class="btn btn-add" onclick="addNewItem()"><i class="fa-solid fa-plus"></i> เพิ่มหัวข้อ</button>
+                <button class="btn btn-save" onclick="saveAllToFirebase()"><i class="fa-solid fa-cloud-arrow-up"></i> บันทึก</button>
+            </div>
+        </div>
+        <div id="maintenanceGrid"></div>
     </div>
 
-    <div id="maintenanceGrid" class="grid"></div>
+    <!-- CONTENT: BATTERY -->
+    <div id="battery" class="tab-content">
+        <div class="card" style="border-left-color: var(--primary);">
+            <h3 style="color: var(--primary);"><i class="fa-solid fa-bolt"></i> แบตเตอรี่ 46B24L</h3>
+            <p class="card-meta">เกณฑ์การตรวจวัดแรงดันไฟ (Voltage)</p>
+            
+            <table class="data-table">
+                <tr><td>แรงดันแบตเตอรี่ (Engine Off)</td><td>> 12.5v</td></tr>
+                <tr><td>สตาร์ทเตอร์เทส (Cranking)</td><td>> 10.3v</td></tr>
+                <tr><td>ไดชาร์จ (Engine On)</td><td>> 13.3v</td></tr>
+            </table>
+
+            <div style="margin-top: 15px; font-size: 0.8rem;">
+                <span class="volt-badge" style="background: var(--success);">ปกติ</span>
+                <span class="volt-badge" style="background: var(--warning);">เฝ้าระวัง (12.0-12.5v)</span>
+                <span class="volt-badge" style="background: var(--danger);">เปลี่ยนทันที (< 12.0v)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTENT: MANUAL -->
+    <div id="manual" class="tab-content">
+        <div class="card" style="border-left-color: var(--accent);">
+            <h3><i class="fa-solid fa-wrench"></i> ค่าแรงขันน็อต (Torque)</h3>
+            <table class="data-table">
+                <tr><td>น็อตน้ำมันเครื่อง</td><td>39 Nm</td></tr>
+                <tr><td>น็อตน้ำมันเกียร์</td><td>49 Nm</td></tr>
+                <tr><td>หัวเทียน</td><td>25 Nm</td></tr>
+                <tr><td>น็อตคอยล์ / ฝาสูบ</td><td>8 / 10 Nm</td></tr>
+                <tr><td>น็อตล้อ (จริง)</td><td>112 Nm</td></tr>
+            </table>
+        </div>
+
+        <div class="card" style="border-left-color: var(--primary);">
+            <h3><i class="fa-solid fa-key"></i> การเซ็ตค่ารีโมท (315 Mhz)</h3>
+            <div class="card-note" style="color: white; line-height: 1.6;">
+                1. เปิดประตูค้างไว้ <br>
+                2. บิดกุญแจ Acc ↔ On (5 ครั้ง) <br>
+                3. ไฟ Security ค้าง → กด Lock (ไฟดับ) <br>
+                4. กด Lock อีกครั้ง (ไฟกระพริบ) <br>
+                5. ปิดประตู ทดสอบรีโมท
+            </div>
+            <p class="card-meta" style="margin-top: 10px;">* ปิดเสียงกันขโมย: ปลดล็อค + ปุ่มเสียง ค้างไว้</p>
+        </div>
+    </div>
 </div>
 
 <script>
-    // 1. Firebase Configuration จากที่คุณส่งมา
+    // Config เดิมของคุณ
     const firebaseConfig = {
         apiKey: "AIzaSyAgWzfe-JzSDq5Q7JTw_GuWPyl9xmLUxjM",
         authDomain: "vios2005-30708.firebaseapp.com",
@@ -83,117 +230,93 @@
         projectId: "vios2005-30708",
         storageBucket: "vios2005-30708.firebasestorage.app",
         messagingSenderId: "115308964965",
-        appId: "1:115308964965:web:f41907f65455acc30aea8c",
-        measurementId: "G-5HGY9M72RM"
+        appId: "1:115308964965:web:f41907f65455acc30aea8c"
     };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-
-    // ข้อมูลเริ่มต้นสำหรับ Vios ของคุณ
-    const defaultData = [
-        { id: 1, name: "น้ำมันเครื่อง Shell hx8", nextKm: 212000, note: "เติม 3.7 ลิตร (10-40) 1,650.-" },
-        { id: 2, name: "น้ำมันเกียร์ T-iv", nextKm: 240000, note: "ปริมาณ 3.5 ลิตร (ล่าสุด 22 ก.พ. 68)" },
-        { id: 3, name: "น้ำมันเบรก TRW", nextKm: 240000, note: "ลำดับ: หลังซ้าย > หลังขวา > หน้าซ้าย > หน้าขวา" },
-        { id: 4, name: "น้ำมันพาวเวอร์", nextKm: 240000, note: "Toyota (ล่าสุด 19 ก.พ. 68)" },
-        { id: 5, name: "น้ำยาหล่อเย็น", nextKm: 220000, note: "Toyota (ล่าสุด 22 พ.ค. 67)" },
-        { id: 6, name: "สายพานหน้าเครื่อง", nextKm: 270000, note: "ล่าสุด 1 ก.ย. 67 (ที่ 190k กม.)" },
-        { id: 7, name: "หัวเทียน Toyota", nextKm: 240000, note: "ล่าสุด 10 ก.พ. 68" }
-    ];
-
     let maintenanceData = [];
     let isAdmin = false;
-    let saveTimeout;
 
-    // --- ส่วนการจัดการข้อมูล ---
-
-    // ดึงข้อมูล Realtime จาก Firebase
-    db.ref('vios_data').on('value', (snapshot) => {
-        const cloudData = snapshot.val();
-        if (cloudData) {
-            maintenanceData = cloudData.items || defaultData;
-            document.getElementById('currentMileage').value = cloudData.currentMileage || 200000;
-            renderDashboard(cloudData.currentMileage || 0);
-        } else {
-            // ถ้าเป็นครั้งแรก ให้ส่งค่าเริ่มต้นขึ้นไป
-            db.ref('vios_data').set({
-                currentMileage: 200000,
-                items: defaultData
-            });
+    db.ref('vios_data').on('value', (snap) => {
+        const data = snap.val();
+        if(data) {
+            maintenanceData = data.items || [];
+            document.getElementById('currentMileage').value = data.currentMileage || 0;
+            renderMaintenance(data.currentMileage || 0);
         }
     });
 
-    // บันทึกเฉพาะเลขไมล์ (Auto-save)
     function saveMileage(val) {
-        const m = parseInt(val) || 0;
-        document.getElementById('syncStatus').innerText = "สถานะ: กำลังพิมพ์...";
-        clearTimeout(saveTimeout);
-        saveTimeout = setTimeout(() => {
-            db.ref('vios_data/currentMileage').set(m).then(() => {
-                document.getElementById('syncStatus').innerText = "สถานะ: เลขไมล์อัปเดตบน Cloud แล้ว";
-            });
-        }, 1000);
+        db.ref('vios_data/currentMileage').set(parseInt(val) || 0);
     }
 
-    // บันทึกข้อมูลทั้งหมด (สำหรับโหมดแอดมิน)
-    function saveAllToFirebase() {
-        db.ref('vios_data/items').set(maintenanceData).then(() => {
-            alert("บันทึกข้อมูลหัวข้อต่างๆ เรียบร้อย!");
-            toggleAdmin();
-        });
+    function openTab(tabName, btn) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabName).classList.add('active');
+        btn.classList.add('active');
+        window.scrollTo(0,0);
     }
-
-    // อัปเดตข้อมูลในตัวแปรชั่วคราว
-    function updateLocalData(id, field, value) {
-        const item = maintenanceData.find(d => d.id === id);
-        if (item) {
-            item[field] = (field === 'nextKm') ? parseInt(value) : value;
-        }
-    }
-
-    // --- ส่วนการแสดงผล ---
 
     function toggleAdmin() {
         isAdmin = !isAdmin;
-        document.body.classList.toggle('admin-active');
-        renderDashboard(document.getElementById('currentMileage').value);
+        document.getElementById('adminPanel').style.display = isAdmin ? 'flex' : 'none';
+        renderMaintenance(document.getElementById('currentMileage').value);
     }
 
-    function renderDashboard(current) {
+    function renderMaintenance(current) {
         const grid = document.getElementById('maintenanceGrid');
         grid.innerHTML = '';
-
         maintenanceData.forEach(item => {
-            const remaining = item.nextKm - current;
-            let statusClass = 'status-ok';
-            let statusText = 'ปกติ';
-
-            if (remaining <= 0) { statusClass = 'status-danger'; statusText = 'เกินกำหนด!'; }
-            else if (remaining <= 2000) { statusClass = 'status-warning'; statusText = 'ใกล้แล้ว'; }
-
+            const rem = item.nextKm - current;
+            const status = rem <= 0 ? 'status-danger' : (rem <= 2000 ? 'status-warning' : 'status-ok');
+            
             const card = document.createElement('div');
-            card.className = `card ${statusClass}`;
-            card.innerHTML = `
-                <div class="display-fields">
-                    <span style="font-size:0.7rem; font-weight:bold; color:#888;">${statusText}</span>
-                    <h3 style="margin:5px 0;">${item.name}</h3>
-                    <div class="remaining" style="color:${remaining <= 0 ? 'var(--danger)' : 'var(--primary)'}">
-                        ${remaining <= 0 ? 'เกินมา ' + Math.abs(remaining).toLocaleString() : 'อีก ' + remaining.toLocaleString()} กม.
+            card.className = `card ${status}`;
+            
+            if(!isAdmin) {
+                card.innerHTML = `
+                    <h3>${item.name}</h3>
+                    <div class="rem-val" style="color: ${rem <= 0 ? 'var(--danger)' : (rem <= 2000 ? 'var(--warning)' : 'var(--success)')}">
+                        ${rem <= 0 ? 'OVERDUE ' + Math.abs(rem).toLocaleString() : rem.toLocaleString() + ' KM'}
                     </div>
-                    <div style="font-size:0.85rem;">กำหนด: <b>${item.nextKm.toLocaleString()} กม.</b></div>
-                    <p class="note">${item.note}</p>
-                </div>
-
-                <div class="edit-fields">
-                    <label>หัวข้อ:</label><br>
-                    <input type="text" value="${item.name}" onchange="updateLocalData(${item.id}, 'name', this.value)" style="width:90%"><br>
-                    <label>ระยะถัดไป (กม.):</label><br>
-                    <input type="number" value="${item.nextKm}" onchange="updateLocalData(${item.id}, 'nextKm', this.value)"><br>
-                    <label>หมายเหตุ:</label><br>
-                    <input type="text" value="${item.note}" onchange="updateLocalData(${item.id}, 'note', this.value)" style="width:90%">
-                </div>
-            `;
+                    <div class="card-meta">NEXT SERVICE: ${item.nextKm.toLocaleString()} KM</div>
+                    ${item.note ? `<div class="card-note">${item.note}</div>` : ''}
+                `;
+            } else {
+                card.innerHTML = `
+                    <input type="text" class="edit-input" value="${item.name}" onchange="updateItem(${item.id}, 'name', this.value)">
+                    <input type="number" class="edit-input" value="${item.nextKm}" onchange="updateItem(${item.id}, 'nextKm', this.value)">
+                    <input type="text" class="edit-input" value="${item.note}" onchange="updateItem(${item.id}, 'note', this.value)">
+                    <button onclick="deleteItem(${item.id})" style="background:none; border:none; color:var(--danger); margin-top:10px; cursor:pointer;"><i class="fa-solid fa-trash"></i> ลบรายการ</button>
+                `;
+            }
             grid.appendChild(card);
+        });
+    }
+
+    function updateItem(id, f, v) {
+        const i = maintenanceData.find(x => x.id === id);
+        if(i) i[f] = f === 'nextKm' ? parseInt(v) : v;
+    }
+
+    function addNewItem() {
+        maintenanceData.push({ id: Date.now(), name: "ใหม่", nextKm: 0, note: "" });
+        renderMaintenance(document.getElementById('currentMileage').value);
+    }
+
+    function deleteItem(id) {
+        if(confirm('ลบรายการนี้?')) {
+            maintenanceData = maintenanceData.filter(x => x.id !== id);
+            renderMaintenance(document.getElementById('currentMileage').value);
+        }
+    }
+
+    function saveAllToFirebase() {
+        db.ref('vios_data/items').set(maintenanceData).then(() => {
+            alert("บันทึกสำเร็จ!");
+            toggleAdmin();
         });
     }
 </script>
